@@ -1,8 +1,10 @@
 import flet as ft
 import os
 import shutil
+import json
 from pathlib import Path
 
+EXTENSION_FILE = "filetypes.json"
 DEFAULT_EXTENSIONS = {
     "Images": [".jpg", ".jpeg", ".png", ".gif", ".webp"],
     "PDFs": [".pdf"],
@@ -13,6 +15,15 @@ DEFAULT_EXTENSIONS = {
     "Programs": [".exe", ".msi", ".bat"]
 }
 
+def load_extensions():
+    if os.path.exists(EXTENSION_FILE):
+        with open(EXTENSION_FILE, "r") as f:
+            return json.load(f)
+    else:
+        with open(EXTENSION_FILE, "w") as f:
+            json.dump(DEFAULT_EXTENSIONS, f, indent=2)
+        return DEFAULT_EXTENSIONS
+
 def main(page: ft.Page):
     page.title = "FileSort"
     page.window_width = 460
@@ -21,6 +32,8 @@ def main(page: ft.Page):
     page.theme_mode = ft.ThemeMode.DARK
     page.bgcolor = "black"
     page.scroll = "adaptive"
+
+    EXTENSIONS = load_extensions()
 
     folder_path = ft.TextField(
         label="Target Folder", 
@@ -35,7 +48,7 @@ def main(page: ft.Page):
     progress_bar = ft.ProgressBar(width=360, value=0, color="#1976d2")
 
     checkboxes = []
-    for cat in DEFAULT_EXTENSIONS:
+    for cat in EXTENSIONS:
         cb = ft.Checkbox(
             label=cat,
             value=True,
@@ -45,13 +58,11 @@ def main(page: ft.Page):
         )
         checkboxes.append(cb)
 
-    # -- NEU: FilePicker Control für Directory Auswahl --
     picker = ft.FilePicker(on_result=lambda e: (
         setattr(folder_path, "value", e.path if e.path else ""),
         page.update()
     ))
-
-    page.overlay.append(picker)  # WICHTIG: Picker zur Page-Overlay hinzufügen
+    page.overlay.append(picker)
 
     def pick_folder(e):
         picker.get_directory_path(dialog_title="Select folder...")
@@ -72,7 +83,7 @@ def main(page: ft.Page):
             if file.is_file():
                 matched = False
                 for cat in selected_categories:
-                    if file.suffix.lower() in DEFAULT_EXTENSIONS[cat]:
+                    if file.suffix.lower() in EXTENSIONS[cat]:
                         target_dir = folder / cat.lower()
                         target_dir.mkdir(exist_ok=True)
                         shutil.move(str(file), target_dir / file.name)
