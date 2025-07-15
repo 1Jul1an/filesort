@@ -1,0 +1,46 @@
+{
+  "Images": [
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".gif",
+    ".webp"
+  ],
+  "PDFs": [
+    ".pdf"
+  ],
+  "Archives": [
+    ".zip",
+    ".rar",
+    ".tar",
+    ".gz",
+    ".7z"
+  ],
+  "Office": [
+    ".doc",
+    ".docx",
+    ".xls",
+    ".xlsx",
+    ".ppt",
+    ".pptx"
+  ],
+  "Code": [
+    ".py",
+    ".js",
+    ".ts",
+    ".html",
+    ".css",
+    ".java",
+    ".cpp"
+  ],
+  "Docs": [
+    ".txt",
+    ".md",
+    ".csv"
+  ],
+  "Executables": [
+    ".exe",
+    ".msi",
+    ".bat"
+  ]
+}
