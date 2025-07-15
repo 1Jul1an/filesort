@@ -1,7 +1,7 @@
 # FileSort GUI – Sort your folder with one click
 
 A small desktop tool to organize files by category using a simple GUI.  
-Built with Python and `customtkinter`, no external dependencies required.
+Built with Python and `tkinter`, no external dependencies required.
 
 ## Features
 
@@ -11,10 +11,15 @@ Built with Python and `customtkinter`, no external dependencies required.
 - Toggle categories on/off
 - Live status updates and summary dialog
 - Runs on Windows, macOS, Linux
-- UI made with `customtkinter`
+- Modern version made with `customtkinter` (modernfilesort.py) 
 
 ## How to Run
 
+only modernfilesort.py version needs
 ```bash
 pip install customtkinter
+python modernfilesort.py
+``` 
+
+```bash
 python filesort.py

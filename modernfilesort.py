@@ -2,8 +2,8 @@ import os
 import shutil
 import json
 from pathlib import Path
-import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
+import customtkinter as ctk
+from tkinter import filedialog, messagebox
 
 EXTENSION_FILE = "filetypes.json"
 
@@ -18,15 +18,17 @@ DEFAULT_EXTENSIONS = {
 }
 
 
-class FileSortApp(tk.Tk):
+class FileSortApp(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("FileSort")
-        self.geometry("700x720")
+        self.geometry("720x740")
         self.resizable(False, False)
+        ctk.set_appearance_mode("system")
+        ctk.set_default_color_theme("blue")
 
-        self.folder_path = tk.StringVar()
-        self.progress = tk.DoubleVar()
+        self.folder_path = ctk.StringVar()
+        self.progress = ctk.DoubleVar()
         self.extensions = {}
         self.check_vars = {}
 
@@ -43,45 +45,48 @@ class FileSortApp(tk.Tk):
                 json.dump(self.extensions, f, indent=2)
 
     def build_ui(self):
-        padding = {"padx": 20, "pady": 10}
-
         # Header
-        header = ttk.Frame(self)
-        header.pack(fill="x", **padding)
+        header = ctk.CTkFrame(self, height=80, fg_color="transparent")
+        header.pack(fill="x", padx=20, pady=(15, 0))
 
-        ttk.Label(header, text="FileSort", font=("Segoe UI", 20, "bold")).pack(anchor="center")
+        ctk.CTkLabel(header, text="FileSort", font=ctk.CTkFont(size=28, weight="bold")).pack(pady=(10, 0))
+
+        self.theme_switch = ctk.CTkSwitch(header, text="Dark Mode", command=self.toggle_theme)
+        self.theme_switch.pack(pady=(10, 0))
+        self.theme_switch.select()
 
         # Main Frame
-        main = ttk.Frame(self)
-        main.pack(fill="both", expand=True, padx=30, pady=15)
+        main = ctk.CTkFrame(self, corner_radius=15)
+        main.pack(fill="both", expand=True, padx=40, pady=20)
 
         # Folder Selection
-        ttk.Label(main, text="Target Folder:", font=("Segoe UI", 12, "bold")).pack(anchor="w", pady=(10, 0))
-        path_frame = ttk.Frame(main)
+        ctk.CTkLabel(main, text="Target Folder", font=ctk.CTkFont(size=16)).pack(anchor="w", pady=(10, 5))
+        path_frame = ctk.CTkFrame(main, fg_color="transparent")
         path_frame.pack(fill="x", pady=5)
-        ttk.Entry(path_frame, textvariable=self.folder_path, width=60).pack(side="left", expand=True, fill="x", padx=(0, 10))
-        ttk.Button(path_frame, text="Browse", command=self.browse_folder).pack(side="right")
+        ctk.CTkEntry(path_frame, textvariable=self.folder_path, placeholder_text="Path to folder...", height=38).pack(side="left", expand=True, fill="x", padx=(0, 10))
+        ctk.CTkButton(path_frame, text="Browse", width=100, command=self.browse_folder).pack(side="right")
 
         # Category Toggles
-        ttk.Label(main, text="Categories:", font=("Segoe UI", 12, "bold")).pack(anchor="w", pady=(20, 5))
-        cat_frame = ttk.Frame(main)
-        cat_frame.pack(fill="x")
+        ctk.CTkLabel(main, text="Categories", font=ctk.CTkFont(size=16)).pack(anchor="w", pady=(20, 10))
+        cat_frame = ctk.CTkFrame(main, fg_color="transparent")
+        cat_frame.pack(fill="x", pady=5)
         for i, category in enumerate(self.extensions.keys()):
-            var = tk.BooleanVar(value=True)
+            var = ctk.BooleanVar(value=True)
             self.check_vars[category] = var
-            ttk.Checkbutton(cat_frame, text=category, variable=var).grid(row=i // 2, column=i % 2, sticky="w", padx=10, pady=4)
+            ctk.CTkSwitch(cat_frame, text=category, variable=var).grid(row=i // 2, column=i % 2, padx=20, pady=8, sticky="w")
 
-        # Start Button
-        ttk.Button(main, text="Start Sorting", command=self.sort_files).pack(pady=20)
-
-        # Progress
-        self.progress_bar = ttk.Progressbar(main, variable=self.progress, maximum=1)
-        self.progress_bar.pack(fill="x", padx=10)
-        self.progress_label = ttk.Label(main, text="", foreground="gray")
+        # Start Button + Progress
+        ctk.CTkButton(main, text="Start Sorting", command=self.sort_files, height=45, font=ctk.CTkFont(size=14)).pack(pady=25)
+        self.progress_bar = ctk.CTkProgressBar(main, variable=self.progress, height=14)
+        self.progress_bar.pack(fill="x", padx=10, pady=5)
+        self.progress_label = ctk.CTkLabel(main, text="", text_color="gray")
         self.progress_label.pack()
 
         # Footer
-        ttk.Label(self, text="Created by: https://github.com/1Jul1an", foreground="gray").pack(side="bottom", pady=10)
+        ctk.CTkLabel(self, text="Created by: https://github.com/1Jul1an", font=ctk.CTkFont(size=12), text_color="gray").pack(side="bottom", pady=10)
+
+    def toggle_theme(self):
+        ctk.set_appearance_mode("dark" if self.theme_switch.get() else "light")
 
     def browse_folder(self):
         selected = filedialog.askdirectory()
@@ -113,7 +118,7 @@ class FileSortApp(tk.Tk):
                 if not matched:
                     skipped += 1
             self.progress.set((i + 1) / total)
-            self.progress_label.config(text=f"{moved} moved · {skipped} skipped")
+            self.progress_label.configure(text=f"{moved} moved · {skipped} skipped")
 
         messagebox.showinfo("Done", f"Sorting completed.\nMoved: {moved}\nSkipped: {skipped}")
 
